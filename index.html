@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="author" content="Chris Osahon"><title>TradeVerse – Trading Simulator</title>
+<style>
+:root{--bg:#0b0f17;--pn:#121826;--pn2:#18202f;--bd:#222c3f;--tx:#e6ebf5;--mut:#7f8da8;--up:#22c58b;--dn:#f0506e;--ac:#5b8cff;--gold:#f5b942;--grid:#1c2538;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#eef1f7;--pn:#fff;--pn2:#f4f6fb;--bd:#dde3ef;--tx:#151b2b;--mut:#66738e;--grid:#e8ecf4}}
+:root[data-theme="light"]{--bg:#eef1f7;--pn:#fff;--pn2:#f4f6fb;--bd:#dde3ef;--tx:#151b2b;--mut:#66738e;--grid:#e8ecf4}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 Inter,system-ui,Segoe UI,Roboto,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--pn);border-bottom:1px solid var(--bd);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.logo{font-weight:800;font-size:18px}.logo b{color:var(--ac)}
+.me{display:flex;align-items:center;gap:10px}.av{font-size:26px;background:var(--pn2);border-radius:50%;width:42px;height:42px;display:grid;place-items:center}
+.xp{width:130px;height:6px;background:var(--pn2);border-radius:9px;overflow:hidden;margin-top:3px}.xp i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--up))}
+.stats{display:flex;gap:18px;flex-wrap:wrap}.stat small{display:block;color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.5px}.stat b{font-size:16px}
+nav{display:flex;gap:4px;padding:8px 16px;overflow-x:auto}
+nav button{background:none;border:0;color:var(--mut);padding:8px 14px;border-radius:8px;font-weight:600;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--ac);color:#fff}
+main{padding:0 16px 24px;max-width:1500px;margin:auto}
+.v{display:none}.v.on{display:block}
+.card{background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:14px}
+.grid{display:grid;grid-template-columns:270px 1fr 300px;gap:12px}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}}
+h3{margin:0 0 10px;font-size:15px}
+input,select{background:var(--pn2);border:1px solid var(--bd);color:var(--tx);padding:8px;border-radius:8px;width:100%;font:inherit}
+.btn{background:var(--ac);color:#fff;border:0;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer;font:inherit;font-weight:700}
+.btn.g{background:var(--up)}.btn.r{background:var(--dn)}.btn.o{background:var(--pn2);color:var(--tx);border:1px solid var(--bd)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.ml{max-height:520px;overflow-y:auto;margin-top:8px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:7px 8px;border-radius:8px;cursor:pointer}
+.row:hover,.row.on{background:var(--pn2)}.row small{color:var(--mut)}
+.up{color:var(--up)}.dn{color:var(--dn)}
+canvas{width:100%;height:380px;display:block}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}.tag{padding:4px 10px;border-radius:99px;background:var(--pn2);border:1px solid var(--bd);cursor:pointer;font-size:12px;color:var(--mut)}.tag.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.f{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+@media(max-width:600px){.f{grid-template-columns:1fr 1fr}}
+.f label{font-size:11px;color:var(--mut);display:block}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--bd);font-size:13px;white-space:nowrap}th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase}
+.wrap{overflow-x:auto}
+.news div{padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px}.news small{color:var(--mut)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.item .big{font-size:42px}.item h4{margin:4px 0}.pill{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--pn2);color:var(--mut)}
+.ck{padding:6px 0}.ck.ok{color:var(--up)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:grid;place-items:center;z-index:20;padding:16px}.modal .card{max-width:460px;width:100%}
+.avs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.avs span{font-size:28px;padding:6px;border-radius:10px;cursor:pointer;border:2px solid transparent;background:var(--pn2)}.avs span.on{border-color:var(--ac)}
+.toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ac);color:#fff;padding:10px 18px;border-radius:99px;z-index:30;font-weight:600;display:none;max-width:90%}
+.q button{display:block;width:100%;text-align:left;margin:5px 0}
+.tip{background:var(--pn2);border-left:3px solid var(--gold);padding:8px 10px;border-radius:6px;font-size:12px;margin-top:8px;color:var(--mut)}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:14px 16px 24px}
+/* Responsive layer */
+html{-webkit-text-size-adjust:100%}body{overflow-x:auto}img,canvas{max-width:100%}
+@media(min-width:1700px){main{max-width:1800px}.grid{grid-template-columns:320px 1fr 340px}}
+@media(max-width:1000px){.grid{grid-template-columns:1fr 1fr}.grid>div:nth-child(2){order:-1;grid-column:1/-1}.ml{max-height:320px}}
+@media(max-width:700px){
+.grid{grid-template-columns:1fr}header{position:static;padding:10px 12px;gap:8px}
+.stats{width:100%;justify-content:space-between;gap:10px}.stat b{font-size:14px}.xp{width:90px}
+main{padding:0 10px 20px}nav{padding:6px 10px}canvas{height:300px}.card{padding:12px}
+input,select{font-size:16px}.btn{min-height:42px}th,td{padding:7px 5px;font-size:12px}
+.cards{grid-template-columns:1fr 1fr}#v-rank .cards{grid-template-columns:1fr!important}
+.modal .card{max-height:92vh;overflow-y:auto}#prof div[style*="display:flex"]{flex-wrap:wrap}.ml{max-height:260px}}
+@media(max-width:420px){.cards{grid-template-columns:1fr}.logo{font-size:16px}.me{width:100%}canvas{height:260px}.f{grid-template-columns:1fr 1fr;gap:6px}}
+@media(max-height:520px) and (orientation:landscape){canvas{height:240px}.modal{align-items:start;overflow-y:auto}}
+/* Portrait fit: stop wide content from forcing the page wider than the screen */
+html,body{max-width:100%}.grid>*,.cards>*,.f>*,.stats>*,.me>*,main>section>*{min-width:0;max-width:100%}
+input,select,button{min-width:0;max-width:100%}.card{overflow-wrap:anywhere}.wrap{max-width:100%}
+.row>div{min-width:0}.tags{max-width:100%}
+@media(max-width:700px){.f{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.cards{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.grid{grid-template-columns:minmax(0,1fr)}header{width:100%}.logo{font-size:17px}.me{flex:1 1 auto}}
+@media(max-width:420px){.cards{grid-template-columns:minmax(0,1fr)}.stats{gap:6px}.stat small{font-size:10px}.stat b{font-size:13px}nav button{padding:8px 10px}}
+nav{scrollbar-width:none;-webkit-overflow-scrolling:touch}nav::-webkit-scrollbar{display:none}nav button{flex:0 0 auto;min-width:max-content;max-width:none;white-space:nowrap}
+</style></head><body>
+<header>
+ <div class="logo">📈 Trade<b>Verse</b></div>
+ <div class="me"><div class="av" id="hav"></div><div><b id="hname"></b><div style="font-size:12px;color:var(--gold)" id="hlv"></div><div class="xp"><i id="hxp"></i></div></div></div>
+ <div class="stats"><div class="stat"><small>Cash</small><b id="hc"></b></div><div class="stat"><small>Equity</small><b id="he"></b></div><div class="stat"><small>Open P/L</small><b id="hp"></b></div><button class="btn o" onclick="logout()">Log out</button></div>
+</header>
+<nav id="nav"></nav>
+<main>
+<section class="v on" id="v-trade"><div class="grid">
+ <div class="card"><h3>Markets</h3><input id="srch" placeholder="Search symbol or name…" oninput="renderML()"><div class="tags" id="tags" style="margin-top:8px"></div><div class="ml" id="ml"></div></div>
+ <div>
+  <div class="card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div><b style="font-size:18px" id="ts"></b> <small style="color:var(--mut)" id="tn"></small><div style="font-size:24px;font-weight:700" id="tp"></div></div><div style="display:flex;gap:10px;align-items:center"><label style="font-size:12px"><input type="checkbox" id="sma" checked style="width:auto"> SMA 20</label><select id="ind" style="width:auto" onchange="draw()"><option>None</option><option>RSI</option><option>MACD</option></select></div></div><canvas id="cv"></canvas><canvas id="cv2" style="height:100px;display:none"></canvas></div>
+  <div class="card" style="margin-top:12px"><h3>Place Order</h3>
+   <div style="display:flex;gap:8px"><button class="btn g" style="flex:1" id="bb" onclick="side(1)">BUY / LONG</button><button class="btn o" style="flex:1" id="bs" onclick="side(-1)">SELL / SHORT</button></div>
+   <div class="f"><div><label id="ql">Size</label><input id="qty" type="number" step="any" oninput="info()"></div><div><label>Leverage</label><select id="lev" onchange="info()"></select></div><div><label>Stop Loss</label><input id="sl" type="number" step="any" oninput="info()"></div><div><label>Take Profit</label><input id="tpi" type="number" step="any" oninput="info()"></div></div>
+   <div class="f"><div><label>Order type</label><select id="ot"><option>Market</option><option>Limit</option><option>Stop</option></select></div><div><label>Trigger price (Limit/Stop)</label><input id="lp" type="number" step="any"></div></div><div id="inf" style="color:var(--mut);font-size:13px"></div>
+   <div style="display:flex;gap:8px;margin-top:10px"><button class="btn o" onclick="autoSL()">🛡 Auto SL/TP (1:2)</button><button class="btn" style="flex:1" onclick="openPos()">Execute Order</button></div>
+   <div class="tip" id="tip"></div></div>
+  <div class="card wrap" style="margin-top:12px"><h3>Open Positions</h3><div id="pt1"></div></div>
+ </div>
+ <div class="card"><h3>📰 Market News</h3><div class="news" id="news"></div></div>
+</div></section>
+
+<section class="v" id="v-port"><div class="cards" id="pstats"></div>
+ <div class="card wrap" style="margin-top:12px"><h3>Open Positions</h3><div id="pt2"></div></div>
+ <div class="card" style="margin-top:12px"><h3>💸 Cash Out</h3><div id="cash"></div></div>
+ <div class="card wrap" style="margin-top:12px"><h3>Trade History</h3><div id="hist"></div></div></section>
+
+<section class="v" id="v-acad"><div class="card" style="margin-bottom:12px">🎓 Finish every lesson, then prove forex discipline in live simulated trades to unlock cash-outs. Each lesson earns XP.</div><div class="cards" id="les"></div></section>
+<section class="v" id="v-shop"><div class="card" style="margin-bottom:12px">🛍 Spend your cash on cars, houses and toys. Luxury items unlock with trader level. Houses earn rent income. Purchases reduce your trading capital!</div><div class="cards" id="shop"></div></section>
+<section class="v" id="v-prof"><div class="card" id="prof"></div></section><section class="v" id="v-rank"><div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))"><div class="card"><h3>🏆 Leaderboard (vs rival traders)</h3><div id="lb"></div></div><div class="card"><h3>🎯 Daily Missions</h3><div id="mi"></div></div></div></section>
+</main>
+<footer>Created by <b>Chris Osahon</b> · TradeVerse is an educational simulation, not financial advice</footer><div class="toast" id="toast"></div><div id="mod"></div>
+
+<script>
+const $=s=>document.querySelector(s),f2=(n,d=2)=>n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}),usd=n=>(n<0?'-':'')+'$'+f2(Math.abs(n)),cls=n=>n>=0?'up':'dn';
+const gauss=()=>{let u=0;for(let i=0;i<4;i++)u+=Math.random();return(u-2)*1.7};
+const RAW="AAPL,Apple,Tech,190|MSFT,Microsoft,Tech,420|NVDA,Nvidia,Tech,880|GOOGL,Alphabet,Tech,150|META,Meta Platforms,Tech,500|AMZN,Amazon,Consumer,180|AMD,AMD,Tech,160|INTC,Intel,Tech,35|ORCL,Oracle,Tech,125|CRM,Salesforce,Tech,290|ADBE,Adobe,Tech,520|NFLX,Netflix,Consumer,620|PYPL,PayPal,Finance,62|SHOP,Shopify,Tech,75|UBER,Uber,Tech,70|JPM,JPMorgan Chase,Finance,195|BAC,Bank of America,Finance,37|GS,Goldman Sachs,Finance,450|V,Visa,Finance,280|MA,Mastercard,Finance,470|WFC,Wells Fargo,Finance,58|MS,Morgan Stanley,Finance,95|AXP,American Express,Finance,230|JNJ,Johnson & Johnson,Health,155|PFE,Pfizer,Health,28|UNH,UnitedHealth,Health,500|LLY,Eli Lilly,Health,780|MRK,Merck,Health,125|ABBV,AbbVie,Health,170|XOM,Exxon Mobil,Energy,115|CVX,Chevron,Energy,155|COP,ConocoPhillips,Energy,120|SLB,Schlumberger,Energy,52|WMT,Walmart,Consumer,60|KO,Coca-Cola,Consumer,61|PEP,PepsiCo,Consumer,170|MCD,McDonald's,Consumer,290|NKE,Nike,Consumer,100|SBUX,Starbucks,Consumer,95|DIS,Disney,Consumer,110|COST,Costco,Consumer,730|HD,Home Depot,Consumer,360|BA,Boeing,Industrial,185|CAT,Caterpillar,Industrial,340|GE,General Electric,Industrial,150|LMT,Lockheed Martin,Industrial,450|UPS,UPS,Industrial,150|TSLA,Tesla,Auto,175|F,Ford,Auto,12|GM,General Motors,Auto,40|T,AT&T,Telecom,17|VZ,Verizon,Telecom,40|EURUSD,Euro / US Dollar,Forex,1.085|GBPUSD,Pound / US Dollar,Forex,1.27|AUDUSD,Aussie / US Dollar,Forex,0.66|NZDUSD,Kiwi / US Dollar,Forex,0.61|USDCAD,US Dollar / CAD,Forex,1.36|USDCHF,US Dollar / CHF,Forex,0.9|EURGBP,Euro / Pound,Forex,0.855|BTC,Bitcoin,Crypto,65000|ETH,Ethereum,Crypto,3400|SOL,Solana,Crypto,150|XAU,Gold,Commodity,2350|WTI,Crude Oil,Commodity,78";
+const VOL={stock:.0012,fx:.0004,Crypto:.0028,Commodity:.0009};
+const M={},L=[];
+RAW.split('|').forEach(r=>{const[s,n,sec,p]=r.split(',');const ty=sec=='Forex'?'fx':sec=='Crypto'||sec=='Commodity'?sec:'stock';const m={s,n,sec,ty,p:+p,tr:0,sh:0,c:[],v:VOL[ty]*(.7+Math.random()*.7),dec:ty=='fx'?5:2};m.cur={o:m.p,h:m.p,l:m.p,c:m.p,k:0};M[s]=m;L.push(m)});
+function step(m){m.tr=m.tr*.97+gauss()*m.v*.05;m.sh*=.92;m.p=Math.max(m.p*(1+m.tr+m.sh+gauss()*m.v),.01);const c=m.cur;c.h=Math.max(c.h,m.p);c.l=Math.min(c.l,m.p);c.c=m.p;if(++c.k>=4){m.c.push(c);if(m.c.length>300)m.c.shift();m.cur={o:m.p,h:m.p,l:m.p,c:m.p,k:0}}}
+L.forEach(m=>{for(let i=0;i<260;i++)step(m);m.d0=m.p});
+const fp=(m,p)=>f2(p??m.p,m.dec);
+let S;
+const fresh=()=>({cash:100000,pos:[],hist:[],own:[],xp:0,les:[],fx:{n:0,d:0,p:0},out:0,real:0,id:1,pf:null,ord:[],ms:{d:'',done:[],p:{}},inc:0,dv:0});S=Object.assign(fresh(),S||{});
+let KEY=null;const save=()=>{if(!KEY)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const LV=[['Beginner',0],['Apprentice',150],['Intermediate',400],['Skilled Trader',900],['Advanced',1800],['Professional',3500],['Expert',7000],['Market Legend',14000]];
+const lvl=()=>{let i=0;LV.forEach((l,j)=>{if(S.xp>=l[1])i=j});return i};
+function addXP(n){const b=lvl();S.xp+=Math.round(n);if(lvl()>b)toast('🎉 Level up! You are now '+LV[lvl()][0]);hdr()}
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(e.t);e.t=setTimeout(()=>e.style.display='none',3200)}
+let sel='EURUSD',sd=1,cat='All',view='trade';
+const pnl=p=>(M[p.sym].p-p.entry)*p.qty*p.dir;
+const unreal=()=>S.pos.reduce((a,p)=>a+pnl(p),0),eq=()=>S.cash+S.pos.reduce((a,p)=>a+p.margin+pnl(p),0);
+function hdr(){if(!S.pf)return;const l=lvl(),n=LV[l+1];$('#hav').textContent=S.pf.av;$('#hname').textContent=S.pf.name+' · '+S.pf.cl;$('#hlv').textContent='Lv '+(l+1)+' · '+LV[l][0];$('#hxp').style.width=(n?(S.xp-LV[l][1])/(n[1]-LV[l][1])*100:100)+'%';$('#hc').textContent=usd(S.cash);$('#he').textContent=usd(eq());const u=unreal();$('#hp').textContent=usd(u);$('#hp').className=cls(u)}
+const TABS=[['trade','📊 Trade'],['port','💼 Portfolio'],['acad','🎓 Academy'],['shop','🛍 Shop'],['prof','👤 Profile'],['rank','🏆 Rank & Missions']];
+$('#nav').innerHTML=TABS.map(t=>`<button id="n-${t[0]}" onclick="show('${t[0]}')">${t[1]}</button>`).join('');
+function show(v){view=v;TABS.forEach(t=>{$('#v-'+t[0]).classList.toggle('on',t[0]==v);$('#n-'+t[0]).classList.toggle('on',t[0]==v)});render()}
+function render(){if(view=='trade'){renderML();info();draw()}if(view=='port')rPort();if(view=='acad')rLes();if(view=='shop')rShop();if(view=='prof')rProf();if(view=='rank')rRank();rPos();hdr()}
+const CATS=['All','Stocks','Forex','Crypto','Commodity','Gainers'];
+function renderML(){$('#tags').innerHTML=CATS.map(c=>`<span class="tag ${c==cat?'on':''}" onclick="cat='${c}';renderML()">${c}</span>`).join('');const q=$('#srch').value.toLowerCase();
+ let a=L.filter(m=>(!q||(m.s+m.n).toLowerCase().includes(q))&&(cat=='All'||cat=='Gainers'||(cat=='Stocks'?m.ty=='stock':m.sec==cat)));
+ if(cat=='Gainers')a=a.slice().sort((x,y)=>y.p/y.d0-x.p/x.d0).slice(0,12);
+ $('#ml').innerHTML=a.map(m=>{const ch=(m.p/m.d0-1)*100;return`<div class="row ${m.s==sel?'on':''}" onclick="pick('${m.s}')"><div><b>${m.s}</b><br><small>${m.n}</small></div><div style="text-align:right">${fp(m)}<br><small class="${cls(ch)}">${ch>=0?'+':''}${f2(ch)}%</small></div></div>`}).join('')}
+function pick(s){sel=s;const m=M[s];$('#qty').value=m.ty=='fx'?10000:m.ty=='Crypto'?.1:m.ty=='Commodity'?1:10;$('#ql').textContent=m.ty=='fx'?'Units (10,000 = 0.1 lot)':'Quantity';
+ $('#lev').innerHTML=(m.ty=='fx'?[10,30,50,100]:[1,2,5]).map(x=>`<option>${x}</option>`).join('');$('#sl').value='';$('#tpi').value='';
+ $('#tip').textContent=m.ty=='fx'?'💡 Forex tactic: trade WITH the trend, enter on pullbacks to the SMA, risk ≤2% of equity and always set a stop loss. These habits unlock cash-outs.':'💡 Tip: size positions by risk, not by hope. Decide your stop loss BEFORE you enter.';
+ side(sd);render()}
+function side(d){sd=d;$('#bb').className='btn '+(d>0?'g':'o');$('#bs').className='btn '+(d<0?'r':'o');info()}
+function autoSL(){const m=M[sel],d=m.p*(m.ty=='fx'?.002:.01);$('#sl').value=(m.p-sd*d).toFixed(m.dec);$('#tpi').value=(m.p+sd*d*2).toFixed(m.dec);info()}
+function calc(){const m=M[sel],q=+$('#qty').value||0,lv=+$('#lev').value||1,sl=+$('#sl').value,e=eq();return{q,lv,sl,tp:+$('#tpi').value,not:q*m.p,mar:q*m.p/lv,risk:sl?Math.abs(m.p-sl)*q:0,e}}
+function info(){const m=M[sel],c=calc(),rp=c.risk/c.e*100;let t=`Notional ${usd(c.not)} · Margin ${usd(c.mar)}`;if(c.sl){t+=` · Risk ${usd(c.risk)} (<span class="${rp>2?'dn':'up'}">${f2(rp)}%</span> of equity)`;if(m.ty=='fx')t+=` · SL ${f2(Math.abs(m.p-c.sl)*1e4,1)} pips`}else t+=' · <span class="dn">No stop loss set!</span>';$('#inf').innerHTML=t}
+function openPos(){const m=M[sel],c=calc();if(!(c.q>0))return toast('Enter a size');if(c.mar>S.cash)return toast('Not enough cash for margin');
+ if(c.sl&&(sd>0?c.sl>=m.p:c.sl<=m.p))return toast('Stop loss is on the wrong side');if(c.tp&&(sd>0?c.tp<=m.p:c.tp>=m.p))return toast('Take profit is on the wrong side');
+ const o={sym:sel,dir:sd,qty:c.q,lev:c.lv,sl:c.sl||0,tp:c.tp||0,ok:!!c.sl&&c.risk/c.e<=.02},ot=$('#ot').value,lp=+$('#lp').value;if(ot!='Market'){if(!lp)return toast('Enter a trigger price');o.type=ot;o.px=lp;o.id=S.id++;S.ord.push(o);save();toast(ot+' order placed');return render()}fill(o);return;
+ }
+function closePos(id,why){const i=S.pos.findIndex(p=>p.id==id);if(i<0)return;const p=S.pos[i],m=M[p.sym];let px=m.p;if(why=='SL')px=p.sl;if(why=='TP')px=p.tp;let r=(px-p.entry)*p.qty*p.dir;if(r<-p.margin){r=-p.margin;why='Margin call'}
+ S.pos.splice(i,1);S.cash+=p.margin+r;S.real+=r;S.hist.unshift({sym:p.sym,dir:p.dir,qty:p.qty,en:p.entry,ex:px,pnl:r,why:why||'Manual'});S.hist=S.hist.slice(0,60);
+ if(m.ty=='fx'){S.fx.n++;S.fx.p+=r;if(p.ok){S.fx.d++;mis('fx')}}if(r>0)mis('win');
+ addXP(10+(r>0?Math.min(r/100,60):0)+(p.ok?10:0));if(why!='Manual'||1)toast((r>=0?'✅ ':'❌ ')+p.sym+' closed '+usd(r)+(why?' ('+why+')':''));save();render()}
+function posTable(){if(!S.pos.length)return'<small style="color:var(--mut)">No open positions.</small>';return`<table><tr><th>Symbol</th><th>Side</th><th>Size</th><th>Entry</th><th>Price</th><th>SL / TP</th><th>P/L</th><th></th></tr>`+S.pos.map(p=>{const m=M[p.sym],r=pnl(p);return`<tr><td><b>${p.sym}</b> <small>${p.lev}x</small></td><td class="${p.dir>0?'up':'dn'}">${p.dir>0?'LONG':'SHORT'}</td><td>${p.qty}</td><td>${fp(m,p.entry)}</td><td>${fp(m)}</td><td>${p.sl?fp(m,p.sl):'–'} / ${p.tp?fp(m,p.tp):'–'}</td><td class="${cls(r)}">${usd(r)}</td><td><button class="btn o" onclick="closePos(${p.id},'Manual')">Close</button></td></tr>`}).join('')+'</table>'}
+function rPos(){if(view=='trade')$('#pt1').innerHTML=posTable();if(view=='port')$('#pt2').innerHTML=posTable()}
+function draw(){const cv=$('#cv'),r=cv.getBoundingClientRect(),dpr=devicePixelRatio||1;if(cv.width!=Math.round(r.width*dpr)||cv.height!=Math.round(r.height*dpr)){cv.width=r.width*dpr;cv.height=r.height*dpr}
+ const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);const W=r.width,H=r.height;x.clearRect(0,0,W,H);const st=getComputedStyle(document.documentElement),up=st.getPropertyValue('--up'),dn=st.getPropertyValue('--dn'),mu=st.getPropertyValue('--mut'),gr=st.getPropertyValue('--grid'),ac=st.getPropertyValue('--ac'),go=st.getPropertyValue('--gold');
+ const m=M[sel],all=m.c.concat([m.cur]),n=Math.min(all.length,Math.floor(W/9)),cs=all.slice(-n);let hi=-1e9,lo=1e9;cs.forEach(c=>{hi=Math.max(hi,c.h);lo=Math.min(lo,c.l)});const pd=(hi-lo)*.1||hi*.001;hi+=pd;lo-=pd;
+ const PW=64,cw=(W-PW)/n,Y=v=>H-18-(v-lo)/(hi-lo)*(H-30);x.font='11px sans-serif';x.fillStyle=mu;x.strokeStyle=gr;
+ for(let i=0;i<=5;i++){const v=lo+(hi-lo)*i/5,y=Y(v);x.beginPath();x.moveTo(0,y);x.lineTo(W-PW,y);x.stroke();x.fillText(fp(m,v),W-PW+6,y+4)}
+ cs.forEach((c,i)=>{const cx=i*cw+cw/2,u=c.c>=c.o;x.strokeStyle=x.fillStyle=u?up:dn;x.beginPath();x.moveTo(cx,Y(c.h));x.lineTo(cx,Y(c.l));x.stroke();x.fillRect(cx-cw*.35,Math.min(Y(c.o),Y(c.c)),cw*.7,Math.max(1,Math.abs(Y(c.o)-Y(c.c))))});
+ if($('#sma').checked){x.strokeStyle=ac;x.lineWidth=1.5;x.beginPath();let s=false;for(let i=all.length-n;i<all.length;i++){if(i<19)continue;let a=0;for(let j=i-19;j<=i;j++)a+=all[j].c;const px=(i-(all.length-n))*cw+cw/2,py=Y(a/20);s?x.lineTo(px,py):x.moveTo(px,py);s=true}x.stroke();x.lineWidth=1}
+ S.pos.filter(p=>p.sym==sel).forEach(p=>{[[p.entry,go,'ENTRY'],[p.sl,dn,'SL'],[p.tp,up,'TP']].forEach(([v,c,t])=>{if(!v||v<lo||v>hi)return;x.strokeStyle=c;x.setLineDash([5,4]);x.beginPath();x.moveTo(0,Y(v));x.lineTo(W-PW,Y(v));x.stroke();x.setLineDash([]);x.fillStyle=c;x.fillText(t,4,Y(v)-3)})});
+ const y=Y(m.p);x.fillStyle=m.cur.c>=m.cur.o?up:dn;x.fillRect(W-PW,y-9,PW,18);x.fillStyle='#fff';x.fillText(fp(m),W-PW+5,y+4);draw2()}
+function tTop(){const m=M[sel],ch=(m.p/m.d0-1)*100;$('#ts').textContent=m.s;$('#tn').textContent=m.n+' · '+m.sec;$('#tp').innerHTML=fp(m)+` <small class="${cls(ch)}" style="font-size:14px">${ch>=0?'+':''}${f2(ch)}%</small>`}
+const NEWS=[['Tech','Chip demand surges as AI spending accelerates',1],['Tech','Regulators open antitrust probe into big tech',-1],['Finance','Central bank signals rate cuts, banks rally',1],['Finance','Credit losses rise, lenders slide',-1],['Health','Breakthrough trial results lift pharma',1],['Health','Drug pricing reform worries healthcare names',-1],['Energy','OPEC cuts output, oil jumps',1],['Energy','Demand fears push crude lower',-1],['Consumer','Record holiday spending boosts retailers',1],['Consumer','Consumer confidence falls sharply',-1],['Industrial','Infrastructure bill boosts industrials',1],['Auto','EV price war squeezes carmakers',-1],['Auto','Auto sales beat expectations',1],['Telecom','5G rollout lifts telecom outlook',1],['Forex','Strong US jobs data lifts the dollar',-1],['Forex','Fed dovish tone weakens the dollar',1],['Crypto','Institutional inflows push crypto higher',1],['Crypto','Exchange hack rattles crypto markets',-1],['Commodity','Safe-haven demand lifts gold',1]];
+function newsEv(){const n=NEWS[Math.random()*NEWS.length|0],mag=.004+Math.random()*.01;L.forEach(m=>{if(m.sec==n[0]||(n[0]=='Forex'&&m.ty=='fx')){let d=n[2];if(n[0]=='Forex'&&m.s.startsWith('USD'))d=-d;m.sh+=d*mag*(m.ty=='fx'?.15:m.ty=='stock'?.6:1)}});
+ const e=document.createElement('div');e.innerHTML=`<small>${new Date().toLocaleTimeString()} · ${n[0]}</small><br>${n[2]>0?'🟢':'🔴'} ${n[1]}`;$('#news').prepend(e);while($('#news').children.length>12)$('#news').lastChild.remove()}
+const LES=[
+['Reading Candlesticks','Basics','Each candle shows Open, High, Low and Close for a period. A green candle closes above its open (buyers won); red closes below (sellers won). Long wicks show rejected prices.','A green candle means…',['Close is above open','Close is below open','Price did not move'],0,50],
+['Trends & Support/Resistance','Basics','Trends are sequences of higher highs/lows (up) or lower highs/lows (down). Support is a floor where buyers step in; resistance is a ceiling where sellers appear. Break-outs often run further.','A price floor where buyers step in is…',['Resistance','Support','Spread'],1,50],
+['The 2% Risk Rule','Risk','Professionals risk only 1–2% of their account per trade. At 2% risk, 10 losses in a row still leaves ~82% of your capital. Survival comes first, profit second.','Account $100,000, 2% rule. Max loss per trade?',['$20,000','$2,000','$200'],1,75],
+['Stop Loss, Take Profit & R:R','Risk','A stop loss exits a losing trade at a pre-set price; take profit locks gains. Risk:Reward of 1:2 means you win twice what you risk — profitable even if you win only 40% of trades.','With 1:2 R:R, break-even win-rate is about…',['33%','75%','90%'],0,75],
+['Leverage & Margin','Forex','Leverage lets you control large positions with small margin: 100x leverage means $1,000 controls $100,000. It magnifies gains AND losses. A 1% adverse move at 100x wipes out your margin. Use low leverage.','At 100x leverage, a 1% adverse move causes…',['1% loss of margin','10% loss of margin','100% loss of margin'],2,100],
+['Pips & Position Sizing','Forex','A pip is 0.0001 on most pairs. Position size = (Account × risk%) ÷ stop distance. Risking $2,000 with a 40-pip (0.0040) stop on EURUSD: 2000 ÷ 0.004 = 500,000 units.','Position size formula is…',['Risk $ ÷ stop distance','Balance × leverage','Entry ÷ stop'],0,100],
+['Forex Tactic: Trend Pullback','Forex','Trade with the trend: when price is above the SMA 20 and trending up, wait for a pullback to the SMA, enter long with a stop below the recent low and target 2R. Reverse for downtrends. Avoid trading against strong momentum.','A trend-pullback buy has the stop…',['Above entry','Below the recent low','No stop'],1,125],
+['Trading Psychology','Mindset','FOMO, revenge trading and overconfidence destroy accounts. Follow a written plan, journal every trade, take breaks after losses, and never add to a loser hoping it returns.','After a big loss you should…',['Double size to recover','Pause and review the plan','Remove stop losses'],1,75],
+['Moving Averages & Crossovers','Intermediate','When a fast average crosses above a slow one (golden cross) momentum is turning up; the reverse is a death cross. Averages lag, so they work best in trends and fail in sideways markets.','A golden cross is when…',['Fast MA crosses above slow MA','Price touches support','RSI hits 50'],0,100],
+['RSI: Overbought & Oversold','Intermediate','RSI (0–100) measures momentum. Above 70 is overbought, below 30 oversold. In strong trends RSI can stay extreme for long, so combine it with trend and support/resistance.','RSI below 30 suggests…',['Overbought','Oversold','No trend'],1,100],
+['MACD Momentum','Skilled','MACD is the gap between 12 and 26 period EMAs. The histogram shows momentum: shrinking bars warn that a move is weakening before price turns.','A shrinking MACD histogram means…',['Momentum is fading','Trend is accelerating','Spread is widening'],0,125],
+['Diversification & Correlation','Skilled','EURUSD and GBPUSD often move together, so trading both doubles your exposure. Spread risk across uncorrelated assets and sectors.','Long EURUSD and long GBPUSD is…',['Diversified','Mostly the same bet','Hedged'],1,125],
+['Limit vs Stop Orders','Advanced','A limit order buys below or sells above the market to get a better price. A stop order triggers when price breaks through a level, used for breakouts and to exit losers.','Buy order to catch a breakout above resistance:',['Buy Limit','Buy Stop','Sell Limit'],1,150],
+['Earnings, News & Dividends','Advanced','Earnings beats or misses and macro news cause gaps and volatility. Long stock holders receive dividends; short sellers pay them. Avoid oversized positions into events.','Who pays the dividend on a stock?',['Long holder','Short seller','Nobody'],1,150],
+['Expectancy & Drawdown','Professional','Expectancy = win% × avg win − loss% × avg loss. A 40% win-rate at 1:2 R:R has +0.2R per trade. Drawdowns of 50% need a 100% gain to recover, so cut size when losing.','Recovering from a 50% loss needs…',['50% gain','100% gain','25% gain'],1,200],
+['Journaling & Edge','Professional','Record setup, reasoning, result and emotion for every trade. Review weekly to find your real edge and your costliest habits. Consistency beats brilliance.','Why keep a trading journal?',['To find your edge and mistakes','To impress others','It is optional noise'],0,200]];
+function rLes(){$('#les').innerHTML=LES.map((l,i)=>{const d=S.les.includes(i),lk=i>=8&&lvl()<1+((i-8)>>1);return`<div class="card"><span class="pill">${l[1]}</span> ${d?'<span class="up">✔ Done</span>':'<span class="pill">+'+l[6]+' XP</span>'}<h4>${l[0]}</h4><p style="color:var(--mut)">${lk?'🔒 Reach level '+(2+((i-8)>>1))+' to unlock':l[2]}</p>${d||lk?'':`<div class="q"><b>${l[3]}</b>${l[4].map((o,j)=>`<button class="btn o" onclick="ans(${i},${j})">${o}</button>`).join('')}</div>`}</div>`}).join('')}
+function ans(i,j){if(j==LES[i][5]){S.les.push(i);mis('learn');addXP(LES[i][6]);toast('✅ Correct! +'+LES[i][6]+' XP');save();rLes()}else toast('❌ Not quite — re-read the lesson and try again')}
+const SH=[['car1','🚗','Toyota Camry','Cars',28000,0],['car2','🚘','BMW M4','Cars',85000,1],['car3','🏎️','Porsche 911','Cars',140000,2],['car4','🏎️','Lamborghini Huracán','Cars',260000,3],['car5','🏁','Bugatti Chiron','Cars',3000000,5],['h1','🏢','City Apartment','Houses',150000,0],['h2','🏡','Suburban Family Home','Houses',450000,1],['h3','🏖️','Beach Villa','Houses',2500000,3],['h4','🌆','Skyline Penthouse','Houses',5000000,4],['h5','🏝️','Private Island','Houses',25000000,6],['g1','🎮','PlayStation 5','Gadgets',500,0],['g2','📱','Latest Smartphone','Gadgets',1200,0],['g3','🖥️','Pro Gaming PC','Gadgets',3500,0],['g4','🎬','Home Cinema','Gadgets',12000,1],['l1','⌚','Rolex Watch','Luxury',15000,1],['l2','👔','Designer Wardrobe','Luxury',8000,0],['l3','🏍️','Superbike','Luxury',22000,1],['l4','🛥️','Luxury Yacht','Luxury',8000000,5],['l5','✈️','Private Jet','Luxury',40000000,7]];
+function rShop(){$('#shop').innerHTML=SH.map(s=>{const o=S.own.includes(s[0]),lk=lvl()<s[5];return`<div class="card item"><div class="big">${s[1]}</div><h4>${s[2]}</h4><span class="pill">${s[3]}</span><div style="margin:8px 0;font-weight:700">${usd(s[4])}</div>${o?`<button class="btn o" onclick="sell('${s[0]}')">Owned · Sell for ${usd(s[4]*.7)}</button>`:lk?`<button class="btn o" disabled>🔒 Level ${s[5]+1}</button>`:`<button class="btn" ${S.cash<s[4]?'disabled':''} onclick="buy('${s[0]}')">Buy</button>`}</div>`}).join('')}
+function buy(id){const s=SH.find(x=>x[0]==id);if(S.cash<s[4])return;S.cash-=s[4];S.own.push(id);addXP(10);save();toast('🛍 You bought '+s[2]);rShop()}
+function sell(id){const s=SH.find(x=>x[0]==id);S.own=S.own.filter(x=>x!=id);S.cash+=s[4]*.7;save();toast('Sold at 70% of price');rShop();hdr()}
+const fxOK=()=>({a:S.les.filter(i=>i<8).length>=8,b:S.fx.d>=5,c:S.fx.p>0});
+function rPort(){const u=unreal();$('#pstats').innerHTML=[['Equity',usd(eq())],['Cash',usd(S.cash)],['Unrealized P/L',usd(u)],['Realized P/L',usd(S.real)],['Total Cashed Out',usd(S.out)],['Assets Owned',S.own.length],['Dividends',usd(S.dv)],['Rent Income',usd(S.inc)]].map(a=>`<div class="card"><small style="color:var(--mut)">${a[0]}</small><div style="font-size:20px;font-weight:700">${a[1]}</div></div>`).join('');
+ const k=fxOK(),all=k.a&&k.b&&k.c,ck=(o,t)=>`<div class="ck ${o?'ok':''}">${o?'✅':'⬜'} ${t}</div>`;
+ $('#cash').innerHTML=`<p style="color:var(--mut)">Withdrawals are locked until you prove you can trade forex like a professional:</p>`+ck(k.a,`Complete the 8 core Academy lessons (${S.les.filter(i=>i<8).length}/8)`)+ck(k.b,`Close 5 disciplined forex trades — stop loss set & risk ≤2% (${Math.min(S.fx.d,5)}/5)`)+ck(k.c,`Positive forex net profit (${usd(S.fx.p)})`)+
+ `<div style="display:flex;gap:8px;margin-top:10px;max-width:420px"><input id="wd" type="number" placeholder="Amount to withdraw"><button class="btn g" ${all?'':'disabled'} onclick="wdr()">${all?'Withdraw':'🔒 Locked'}</button></div>`}
+function wdr(){const a=+$('#wd').value;if(!(a>0)||a>S.cash)return toast('Invalid amount (max = available cash)');S.cash-=a;S.out+=a;addXP(a/200);save();toast('💸 Withdrew '+usd(a)+' to your bank!');render()}
+function rProf(){const l=lvl();$('#prof').innerHTML=`<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><div class="av" style="width:80px;height:80px;font-size:50px">${S.pf.av}</div><div><h2 style="margin:0">${S.pf.name}</h2><div style="color:var(--gold)">${LV[l][0]} · ${S.pf.cl}</div><div style="color:var(--mut)">${Math.round(S.xp)} XP${LV[l+1]?' · next level at '+LV[l+1][1]:' · MAX LEVEL'}</div></div></div>
+ <h3 style="margin-top:18px">Level Path</h3><div class="tags">${LV.map((x,i)=>`<span class="tag ${i<=l?'on':''}">${x[0]}</span>`).join('')}</div>
+ <h3>My Assets</h3><div style="font-size:34px">${S.own.length?S.own.map(i=>SH.find(s=>s[0]==i)[1]).join(' '):'<small style="font-size:14px;color:var(--mut)">Nothing yet — visit the Shop.</small>'}</div>
+ <h3 style="margin-top:14px">Trader Stats</h3><p style="color:var(--mut)">Trades: ${S.hist.length} · Wins: ${S.hist.filter(h=>h.pnl>0).length} · Forex disciplined trades: ${S.fx.d}</p>
+ <div style="display:flex;gap:8px"><button class="btn o" onclick="document.documentElement.dataset.theme=document.documentElement.dataset.theme=='light'?'dark':'light';draw()">🌓 Theme</button><button class="btn r" onclick="if(confirm('Reset everything?')){S=fresh();save();setup()}">Reset Account</button></div>`}
+$('#hist').innerHTML='';
+const _rp=rPort;rPort=function(){_rp();$('#hist').innerHTML=S.hist.length?`<table><tr><th>Symbol</th><th>Side</th><th>Size</th><th>Entry</th><th>Exit</th><th>P/L</th><th>Reason</th></tr>`+S.hist.slice(0,20).map(h=>`<tr><td>${h.sym}</td><td>${h.dir>0?'LONG':'SHORT'}</td><td>${h.qty}</td><td>${f2(h.en,M[h.sym].dec)}</td><td>${f2(h.ex,M[h.sym].dec)}</td><td class="${cls(h.pnl)}">${usd(h.pnl)}</td><td>${h.why}</td></tr>`).join('')+'</table>':'<small style="color:var(--mut)">No closed trades yet.</small>'};
+function setup(){const AV=['🧑‍💼','👩‍💼','🦊','🐺','🦁','🤖','🧙','🐉'],CL=['Day Trader','Swing Trader','Forex Hunter','Value Investor'];let av=AV[0],c=CL[0];
+ $('#mod').innerHTML=`<div class="modal"><div class="card"><h3 style="font-size:20px">Create your trader</h3><input id="nm" placeholder="Trader name" maxlength="16"><div class="avs" id="avs">${AV.map((a,i)=>`<span class="${i?'':'on'}">${a}</span>`).join('')}</div><select id="cl">${CL.map(x=>`<option>${x}</option>`).join('')}</select><p style="color:var(--mut)">You start with <b>$100,000</b> of virtual capital. Grow it, learn, and earn the right to cash out.</p><button class="btn" style="width:100%" id="go">Start Trading</button></div></div>`;
+ document.querySelectorAll('#avs span').forEach(s=>s.onclick=()=>{document.querySelectorAll('#avs span').forEach(x=>x.classList.remove('on'));s.classList.add('on');av=s.textContent});
+ $('#go').onclick=()=>{S.pf={name:$('#nm').value.trim()||'Trader',av,cl:$('#cl').value};$('#mod').innerHTML='';save();pick(sel);show('trade');newsEv()}}
+function fill(o){const m=M[o.sym],mar=o.qty*m.p/o.lev;if(mar>S.cash){toast('Not enough margin for '+o.sym);return false}S.cash-=mar;S.pos.push({id:S.id++,sym:o.sym,dir:o.dir,qty:o.qty,entry:m.p,lev:o.lev,sl:o.sl,tp:o.tp,margin:mar,ok:o.ok});addXP(5);mis('trade');save();toast((o.dir>0?'Bought ':'Sold ')+o.sym+' @ '+fp(m));render();return true}
+const _pt=posTable;posTable=function(){return _pt()+(S.ord.length?'<h3 style="margin-top:12px">Pending Orders</h3><table>'+S.ord.map(o=>`<tr><td>${o.sym}</td><td>${o.type} ${o.dir>0?'BUY':'SELL'}</td><td>${o.qty}</td><td>@ ${f2(o.px,M[o.sym].dec)}</td><td><button class="btn o" onclick="S.ord=S.ord.filter(x=>x.id!=${o.id});render()">Cancel</button></td></tr>`).join('')+'</table>':'')};
+const BOTS=['Warren_B','QuantQueen','BullRunBob','ForexFox','AlgoAndy','CryptoKai','SwingSara','HedgeHank'].map((n,i)=>({n,av:['🦈','👑','🐂','🦊','🤖','🪙','🌊','🏦'][i],e:1e5*(.8+Math.random()*.7),k:(Math.random()-.42)*3e-5,v:2e-4+Math.random()*4e-4}));
+const bots=()=>BOTS.forEach(b=>b.e*=1+b.k+gauss()*b.v);
+const MIS=[['trade','Place 3 trades',3,100,500],['win','Close a winning trade',1,150,1000],['learn','Finish a lesson',1,100,500],['fx','Close a disciplined forex trade',1,200,1500]];
+function mis(id){const d=new Date().toDateString();if(S.ms.d!=d)S.ms={d,done:[],p:{}};S.ms.p[id]=(S.ms.p[id]||0)+1;const q=MIS.find(x=>x[0]==id);if(S.ms.p[id]>=q[2]&&!S.ms.done.includes(id)){S.ms.done.push(id);S.cash+=q[4];addXP(q[3]);toast('🎯 Mission done: '+q[1]+' +'+usd(q[4]))}}
+function rRank(){const d=new Date().toDateString();if(S.ms.d!=d)S.ms={d,done:[],p:{}};const a=BOTS.map(b=>[b.av+' '+b.n,b.e,0]).concat([['⭐ '+S.pf.name+' (you)',eq(),1]]).sort((x,y)=>y[1]-x[1]);
+ $('#lb').innerHTML='<table>'+a.map((x,i)=>`<tr style="${x[2]?'color:var(--gold);font-weight:700':''}"><td>#${i+1}</td><td>${x[0]}</td><td>${usd(x[1])}</td></tr>`).join('')+'</table>';
+ $('#mi').innerHTML=MIS.map(q=>`<div class="ck ${S.ms.done.includes(q[0])?'ok':''}">${S.ms.done.includes(q[0])?'✅':'⬜'} ${q[1]} (${Math.min(S.ms.p[q[0]]||0,q[2])}/${q[2]}) · +${q[3]} XP · ${usd(q[4])}</div>`).join('')+'<div class="tip">Missions reset every day.</div>'}
+function earn(){const s=L.filter(m=>m.ty=='stock'),m=s[Math.random()*s.length|0],b=Math.random()<.5;m.sh+=(b?1:-1)*(.002+Math.random()*.003);const e=document.createElement('div');e.innerHTML=`<small>${new Date().toLocaleTimeString()} · Earnings</small><br>${b?'🟢':'🔴'} ${m.s} earnings ${b?'beat':'miss'} estimates`;$('#news').prepend(e)}
+function rent(){const q=S.own.reduce((a,i)=>{const t=SH.find(x=>x[0]==i);return a+(t[3]=='Houses'?t[4]*3e-4:0)},0);if(q){S.cash+=q;S.inc+=q;toast('🏠 Rent income '+usd(q))}}
+function divs(){let t=0;S.pos.forEach(p=>{if(M[p.sym].ty=='stock')t+=p.qty*M[p.sym].p*.004*p.dir});if(t){S.cash+=t;S.dv+=t;toast((t>0?'💵 Dividends received ':'Dividends paid ')+usd(Math.abs(t)))}}
+const ema=(a,k)=>{let e=a[0];return a.map(v=>e=v*2/(k+1)+e*(1-2/(k+1)))};
+function draw2(){const cv=$('#cv2'),t=$('#ind').value;cv.style.display=t=='None'?'none':'block';if(t=='None')return;const r=cv.getBoundingClientRect(),dpr=devicePixelRatio||1;cv.width=r.width*dpr;cv.height=r.height*dpr;const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);const W=r.width,H=r.height,m=M[sel],cl=m.c.concat([m.cur]).map(c=>c.c),n=Math.min(cl.length,Math.floor(W/9)),PW=64,cw=(W-PW)/n,st=getComputedStyle(document.documentElement),mu=st.getPropertyValue('--mut'),up=st.getPropertyValue('--up'),dn=st.getPropertyValue('--dn'),ac=st.getPropertyValue('--ac');x.font='11px sans-serif';x.fillStyle=mu;
+ if(t=='RSI'){const v=cl.map((_,i)=>{if(i<14)return 50;let g=0,l=0;for(let j=i-13;j<=i;j++){const d=cl[j]-cl[j-1];d>0?g+=d:l-=d}return l==0?100:100-100/(1+g/l)}),Y=q=>H-4-q/100*(H-8);[30,70].forEach(q=>{x.strokeStyle=mu;x.setLineDash([4,4]);x.beginPath();x.moveTo(0,Y(q));x.lineTo(W-PW,Y(q));x.stroke();x.setLineDash([]);x.fillText(q,W-PW+6,Y(q)+4)});x.strokeStyle=ac;x.beginPath();v.slice(-n).forEach((q,i)=>i?x.lineTo(i*cw+cw/2,Y(q)):x.moveTo(i*cw+cw/2,Y(q)));x.stroke();x.fillText('RSI 14: '+f2(v[v.length-1],1),6,12)}
+ else{const a=ema(cl,12),b=ema(cl,26),ml=a.map((q,i)=>q-b[i]),sg=ema(ml,9),h=ml.map((q,i)=>q-sg[i]).slice(-n),mx=Math.max(...h.map(Math.abs),1e-9),Y=q=>H/2-q/mx*(H/2-6);h.forEach((q,i)=>{x.fillStyle=q>=0?up:dn;x.fillRect(i*cw+1,Math.min(Y(q),H/2),cw-2,Math.abs(Y(q)-H/2))});x.fillStyle=mu;x.fillText('MACD histogram (12,26,9)',6,12)}}
+const U=()=>{try{return JSON.parse(localStorage.getItem('tv_users'))||{}}catch(e){return{}}},setU=u=>{try{localStorage.setItem('tv_users',JSON.stringify(u))}catch(e){}};
+async function hs(pw,salt){const t=salt+':'+pw;if(window.crypto&&crypto.subtle){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}let h=5381;for(let i=0;i<t.length;i++)h=(h*33^t.charCodeAt(i))>>>0;return'f'+h}
+function authUI(mode){$('#mod').innerHTML=`<div class="modal"><div class="card"><div class="logo" style="font-size:24px;text-align:center">📈 Trade<b>Verse</b></div><p style="text-align:center;color:var(--mut);margin:4px 0 12px">Practice trading with $100,000 of virtual capital</p><div class="tags" style="justify-content:center"><span class="tag ${mode=='in'?'on':''}" onclick="authUI('in')">Log in</span><span class="tag ${mode=='up'?'on':''}" onclick="authUI('up')">Sign up</span></div><div style="display:grid;gap:8px"><input id="au" placeholder="Username" autocomplete="username" maxlength="16"><input id="ap" type="password" placeholder="Password (min 6 characters)" autocomplete="${mode=='in'?'current-password':'new-password'}">${mode=='up'?'<input id="ap2" type="password" placeholder="Confirm password" autocomplete="new-password">':''}<label style="font-size:12px;color:var(--mut)"><input type="checkbox" id="ak" checked style="width:auto"> Keep me logged in</label><div id="ae" class="dn" style="font-size:13px;min-height:18px"></div><button class="btn" onclick="doAuth('${mode}')">${mode=='in'?'Log in':'Create account'}</button></div><p style="font-size:11px;color:var(--mut);text-align:center;margin:12px 0 0">Accounts are stored on this device only.<br>Created by <b>Chris Osahon</b></p></div></div>`;
+ document.querySelectorAll('#mod input').forEach(i=>i.onkeydown=e=>{if(e.key=='Enter')doAuth(mode)})}
+async function doAuth(mode){const n=$('#au').value.trim(),p=$('#ap').value,err=t=>{$('#ae').textContent=t},us=U(),k=n.toLowerCase();
+ if(!/^[A-Za-z0-9_]{3,16}$/.test(n))return err('Username: 3–16 letters, numbers or _');
+ if(p.length<6)return err('Password must be at least 6 characters');
+ if(mode=='up'){if(p!=$('#ap2').value)return err('Passwords do not match');if(us[k])return err('That username is already taken');const salt=Math.random().toString(36).slice(2)+Date.now().toString(36);us[k]={n,salt,h:await hs(p,salt)};const first=!Object.keys(us).length||Object.keys(us).length==1;setU(us);try{const old=localStorage.getItem('tvsim1');if(old&&first)localStorage.setItem('tvsim_'+k,old)}catch(e){}}
+ else{const u=us[k];if(!u||u.h!=await hs(p,u.salt))return err('Wrong username or password')}
+ try{($('#ak').checked?localStorage:sessionStorage).setItem('tv_sess',k)}catch(e){}
+ loadUser(k)}
+function loadUser(k){KEY='tvsim_'+k;let d={};try{d=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}S=Object.assign(fresh(),d);$('#mod').innerHTML='';pick(sel);show('trade');if(!S.pf)setup()}
+function logout(){save();KEY=null;S=fresh();try{localStorage.removeItem('tv_sess');sessionStorage.removeItem('tv_sess')}catch(e){}authUI('in')}
+let tk=0;
+setInterval(()=>{L.forEach(step);S.pos.slice().forEach(p=>{const m=M[p.sym],r=pnl(p);if(r<=-p.margin)closePos(p.id,'Margin call');else if(p.sl&&(p.dir>0?m.p<=p.sl:m.p>=p.sl))closePos(p.id,'SL');else if(p.tp&&(p.dir>0?m.p>=p.tp:m.p<=p.tp))closePos(p.id,'TP')});
+ S.ord.slice().forEach(o=>{const q=M[o.sym].p,h=o.type=='Limit'?(o.dir>0?q<=o.px:q>=o.px):(o.dir>0?q>=o.px:q<=o.px);if(h){S.ord=S.ord.filter(x=>x.id!=o.id);fill(o)}});bots();if(!S.pf)return;tk++;if(view=='rank')rRank();if(tk%25==0)newsEv();if(tk%90==0)earn();if(tk%30==0)rent();if(tk%120==0)divs();if(tk%5==0)save();tTop();hdr();if(view=='trade'){renderML();draw();info()}rPos();if(view=='port')rPort()},1000);
+pick(sel);let ss=null;try{ss=localStorage.getItem('tv_sess')||sessionStorage.getItem('tv_sess')}catch(e){}if(ss&&U()[ss])loadUser(ss);else authUI('in')
+</script></body></html>
